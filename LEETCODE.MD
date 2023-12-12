@@ -53,6 +53,7 @@ type ListNode struct {
 }
 ```
 &emsp;&emsp;``链表的创建（每个节点存储一位数字）``，在创建的过程中 我们需要设置中间的可变节点，不然我们可能会丢失对链表的第一个节点的索引，以下的例子中我们就使用middle为中间节点；将head设置为头节点，并代表完整的链表
+##### 模拟方式建立
 &emsp;&emsp;我们利用``迭代``的方法，只要还存在num，就更新创建一个新的节点
 ```go
 // 尝试建立有头节点的链表，关键在于赋值给middle.next
@@ -70,12 +71,37 @@ func CreateList(nums int) *ListNode {
 	return Head
 }
 ```
-链表的**递归创建**未完待续
+##### 链表的**递归创建**
 ```go
+// 递归建立链表
+func RecurCreateList(nums int) *ListNode {
+	//在递归时好像不需要单独保存头节点位置，后续的位置会递归存储在next中，不用考虑被覆盖的问题
+	middle := new(ListNode) //建立头指针，其指针不变
 
+	// 123%10=3
+	// 12.3%10=2
+	// 1.23%10=1
+
+	// 120%10=0
+	// 12 %10=2
+	// 1.2%10=1
+
+	if nums > 1 || nums%10 > 0 {
+		middle.Val = nums % 10
+		fmt.Printf("middle.Val: %v\n", middle.Val)
+
+		if nums > 1 {
+			nums /= 10
+			middle.Next = RecurCreateList(nums)
+		}
+
+	}
+	return middle
+}
 ```
 
 #### 链表的读取
+##### 便利读取
 &emsp;&emsp;链表读取时我们需要根据是否具有头节点进行一定的调整，下面是使用``遍历（迭代）``进行创建的过程
 ```go
 // 尝试遍历读取链表
@@ -92,6 +118,7 @@ func ReadList(L ListNode) {
 	}
 }
 ```
+##### 递归读取
 下面为使用**递归**进行读取的方法
 由于节点的定义过程中使用``内嵌``，在建立相关函数时都`使用指针`比较方便[ 虽然前面都没注意:( ],
 ```go
@@ -111,4 +138,79 @@ func RecurReadList(L *ListNode) {
 ```
 
 ### 真正题目部分
+这里选择使用递归方法进行解决
+```go
+package main
 
+import "fmt"
+
+type ListNode struct {
+	Val  int
+	Next *ListNode
+}
+
+func main() {
+	//自定义初始化数据
+	l1 := &ListNode{Val: 2, Next: &ListNode{Val: 4, Next: &ListNode{Val: 3}}}
+	l2 := &ListNode{Val: 5, Next: &ListNode{Val: 6, Next: &ListNode{Val: 4}}}
+
+	c := addTwoNumbers(l1, l2)
+	RecurReadList(c)
+}
+//--------------------------------------------------------------------------------------------
+// 递归方法解决
+func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
+	return addTwo(l1, l2, 0)
+}
+
+func addTwo(l1 *ListNode, l2 *ListNode, carry int) *ListNode {
+
+	middle := &ListNode{}
+
+	//递归传入的指针为空的话，说明计算到最后一位，最后只需要处理进位的问题即可
+	if l1 == nil && l2 == nil {
+		if carry == 1 {
+			middle = &ListNode{Val: 1}
+			return middle
+		}
+		return nil
+	}
+
+	//处理l1、l2任意一个不为1的情况
+	if l1 != nil {
+		middle.Val += l1.Val
+		l1 = l1.Next
+	}
+	if l2 != nil {
+		middle.Val += l2.Val
+		l2 = l2.Next
+	}
+	middle.Val += carry
+	//处理计算到最后的进位处理问题
+	if middle.Val >= 10 {
+		carry = 1
+		middle.Val %= 10
+	} else {
+		carry = 0
+	}
+
+	middle.Next = addTwo(l1, l2, carry)
+	return middle
+
+}
+//--------------------------------------------------------------------------------------
+// 尝试递归读取链表
+func RecurReadList(L *ListNode) {
+
+	fmt.Printf("L.Val: %v\n", L.Val) //打印出此节点中的Val
+
+	//如果本结点的指针不为空，即还有下一个节点，继续读取
+	if L.Next != nil {
+		RecurReadList(L.Next) //将下个节点的指针传入
+	}
+	//如果运行到这里，说明指针为空，函数也就到此结束了
+}
+
+```
+
+## 3.无重复字符的最长子串
