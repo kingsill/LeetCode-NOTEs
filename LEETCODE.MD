@@ -39,4 +39,76 @@ func twoSum(nums []int, target int) []int {
 
 ## 2.两数相加 1×
 &emsp;&emsp;在解决的过程中，遇到的难点在于int的位数，链表的递归查询即建立的问题
- 并未自行接出来
+ &emsp;&emsp;并未自行解出来
+
+### 链表的相关知识
+&emsp;&emsp;链表有时会具有头节点，头节点的指针指向第一个节点的地址，其本身的数据域可以根据自己的选择进行赋值
+
+#### 链表的创建:
+``链表的结构定义``一般如下，即由本身的数据和指向下一个节点的指针构成
+```go
+type ListNode struct {
+	Val  int
+	Next *ListNode//不能直接赋值listnode，避免产生嵌套引用
+}
+```
+&emsp;&emsp;``链表的创建（每个节点存储一位数字）``，在创建的过程中 我们需要设置中间的可变节点，不然我们可能会丢失对链表的第一个节点的索引，以下的例子中我们就使用middle为中间节点；将head设置为头节点，并代表完整的链表
+&emsp;&emsp;我们利用``迭代``的方法，只要还存在num，就更新创建一个新的节点
+```go
+// 尝试建立有头节点的链表，关键在于赋值给middle.next
+func CreateList(nums int) *ListNode {
+	Head := new(ListNode) //这代表一整个链表，并通过这里的头节点进行标注，方便该链表的引用
+
+	middle := Head //middle视作Head链表的中间节点，其一直改变
+
+	for nums > 0 {
+		middle.Next = &ListNode{Val: nums % 10}//头节点赋值方法
+		fmt.Printf("middle.Val: %v\n", middle.Val)
+		middle = middle.Next
+		nums /= 10
+	}
+	return Head
+}
+```
+链表的**递归创建**未完待续
+```go
+
+```
+
+#### 链表的读取
+&emsp;&emsp;链表读取时我们需要根据是否具有头节点进行一定的调整，下面是使用``遍历（迭代）``进行创建的过程
+```go
+// 尝试遍历读取链表
+func ReadList(L ListNode) {
+	middle := L //将头节点赋予这里的中间节点middle
+
+	//循环读取链表的内容
+	for middle.Next != nil {
+		v := middle.Next.Val //由于我们这里判断的是本身节点是否为空，所以在输出时使用下一节点的值进行输出，避免错过某个值
+		fmt.Printf("v: %v\n", v)
+		// 	// fmt.Printf("L: %v\n", L)
+		middle = *middle.Next
+		// 	// fmt.Printf("L: %v\n", L)
+	}
+}
+```
+下面为使用**递归**进行读取的方法
+由于节点的定义过程中使用``内嵌``，在建立相关函数时都`使用指针`比较方便[ 虽然前面都没注意:( ],
+```go
+// 尝试递归读取链表
+func RecurReadList(L *ListNode) {
+
+	fmt.Printf("L.Val: %v\n", L.Val) //打印出此节点中的Val
+
+	//如果本结点的指针不为空，即还有下一个节点，继续读取
+	if L.Next != nil {
+		RecurReadList(L.Next) //将下个节点的指针传入
+	}
+	//如果运行到这里，说明指针为空，函数也就到此结束了
+}
+
+
+```
+
+### 真正题目部分
+
