@@ -1,4 +1,3 @@
-module LEETCODE-NOTES
+module LeetCode-NOTEs
 
-go 1.20
-// go 1.21.4
+go 1.21
