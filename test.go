@@ -1,6 +1,7 @@
 package main
 
 func main() {
-	i := make([]int, 4)
-	i[4] = 1
+	test := map[int]int{1: 2, 2: 3}
+	if _, ok := test[1]; ok {
+	}
 }

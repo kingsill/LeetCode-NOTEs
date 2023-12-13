@@ -18,8 +18,8 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 	z := M + N //两个数组一共有多少位数
 
 	if z%2 == 1 { //奇数
-		I := (M + N + 1)
-		i := OrderSlice(nums1, nums2, I)
+		I := M + N + 1                   //I用来指代需要排序到第几位数
+		i := OrderSlice(nums1, nums2, I) //i指代获得的排序切片
 		var mid float64 = float64(i[I])
 		return mid
 	} else { //偶数
