@@ -11,7 +11,7 @@ func main() {
 
 func twoSum(nums []int, target int) []int {
 	result := map[int]int{} //初始化map的语句，后面的{}的赋初值为空,等同于下一句
-	// result := make(map[int]int)
+	//result := make(map[int]int)
 
 	fmt.Printf("result: %T\n", result)
 
