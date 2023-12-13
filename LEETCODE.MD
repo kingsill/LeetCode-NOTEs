@@ -238,7 +238,7 @@ func lengthOfLongestSubstring(s string) int {
 
 		//fmt.Println(ok)
 
-		if ok { //如果有对应的字母，说明有重复,1.清空当前窗口 2.比较临时最长长度和记录的最长长度，保留较大值 3.清空临时长度计数
+		if ok { //如果有对应的字母，说明有重复
 			//先进行计算，再进行下一个窗口的布置
 			if n[string(v)] >= light { //如果这个重复的字母在light的右边，则需要用这个字母的位置进行最长长度的jisuan
 				fmt.Println("一")
@@ -254,11 +254,9 @@ func lengthOfLongestSubstring(s string) int {
 
 			fmt.Println("i:", i)
 
-			//n = map[string]int{string(v): i} //保留当前重复的一位，从计数1开始计数
 		} else { //如果没有对应的字母1.最长长度计数+1 2.将临时最长长度长度保存
 
 			n[string(v)] = c + 1
-			//MaxTemp = i
 			i++
 		}
 
@@ -272,10 +270,20 @@ func lengthOfLongestSubstring(s string) int {
 }
 ```
 
-### 进阶学习版本
+### 进阶学习版本，即官方版本
+```go
+```
+#### 滑动窗口以及map的相关知识
+&emsp;&emsp;**滑动窗口(同向双指针)** 常用于 **子串** 以及 **子数组** 等相关格式
+&emsp;&emsp;利用for range可以遍历字符串、数组等，得到的index可以作为**右指针**；**左指针**则根据要求进行调整即可‘
+>map中delete函数的使用
+	**func delete(m map[Type]Type1, key Type)**
+删除m中字段为key的一条
 
-
-
+### 自我反思 
+&emsp;&emsp;第一版解法相对于官方的问题所在：
+1.对于左指针的理解不够，没有理解滑动窗口的*滑动*精髓
+2.没有利用好range过程中产生的排序
 
 ## 4.找两个正序数组的中位数
 在本题中遇到了切片的某些问题，这里进行记录
