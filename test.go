@@ -1,7 +1,6 @@
 package main
 
 func main() {
-	test := map[int]int{1: 2, 2: 3}
-	if _, ok := test[1]; ok {
-	}
+	nums := [5]int{1, 2, 3} //初始化一个切片实例
+	slice := nums[:]        //注意切割无论是切割数组还是切片都是``左闭右开``
 }
