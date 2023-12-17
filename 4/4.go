@@ -81,21 +81,23 @@ func SingleOrder(nums []int) float64 {
 */
 
 func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
-	z := len(nums1) + len(nums2)
-	if z%2 == 1 { //奇数
-		return float64(Get(nums1, nums2, (z+1)/2))
+	z := len(nums1) + len(nums2) //两个数组的总的长度
+	if z%2 == 1 {                //奇数
+		return float64(Get(nums1, nums2, (z+1)/2)) //奇数的中位数为中间的一个数
 	} else { //偶数
-		return (float64(Get(nums1, nums2, z/2) + Get(nums1, nums2, z/2+1))) / 2
+		return (float64(Get(nums1, nums2, z/2) + Get(nums1, nums2, z/2+1))) / 2 //偶数的中位数为中间二数的平均值
 	}
 }
 
+// Get 作用为获取nums1和nums2中的第k小数
 func Get(nums1 []int, nums2 []int, k int) int {
-	var Rindex1, Rindex2 = 0, 0
-	offset1, offset2 := 0, 0
-	//Vindex1, Vindex2 := 0, 0
-	var flow int = 0
+	var Rindex1, Rindex2 = 0, 0 //为我们总的偏移量
+	offset1, offset2 := 0, 0    //当前一次循环的偏移量
+
+	var flow int = 0 //定义flow为我们要求的数组的查询位置超限
 
 	for {
+		//如果nums1或2已经查询完毕或者长度为0
 		if Rindex1 == len(nums1) {
 			return nums2[k+Rindex2-1]
 		}
@@ -103,14 +105,17 @@ func Get(nums1 []int, nums2 []int, k int) int {
 			return nums1[k+Rindex1-1]
 		}
 
+		//k==1说明已经查询完毕，返回后一个数即为第k小数
 		if k == 1 {
 
 			return min(nums1[Rindex1], nums2[Rindex2])
 		}
+
+		//计算下一次循环的指针位置（没有越限情况）
 		point1 := k/2 - 1 + Rindex1
 		point2 := k/2 - 1 + Rindex2
 
-		//判断有没有溢出
+		//判断有没有溢出，进行越位处理
 		if k/2-1+Rindex1 > len(nums1)-1 {
 			point1 = len(nums1) - 1
 			flow = 1
@@ -119,6 +124,7 @@ func Get(nums1 []int, nums2 []int, k int) int {
 			point2 = len(nums2) - 1
 			flow = 2
 		}
+
 		if flow == 1 || flow == 2 {
 			if flow == 1 { //如果时数组1超限
 				if nums1[point1] <= nums2[point2] {
@@ -150,9 +156,10 @@ func Get(nums1 []int, nums2 []int, k int) int {
 
 			k -= k / 2
 		}
-
+		//计算总偏移量
 		Rindex1 += offset1
 		Rindex2 += offset2
+		//重置单次偏移量及标志位
 		offset1, offset2, flow = 0, 0, 0
 	}
 
