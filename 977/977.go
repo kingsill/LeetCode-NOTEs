@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	nums := []int{0}
+	nums := []int{1, 2}
 	i := sortedSquares(nums)
 	fmt.Printf("i: %v\n", i)
 }
@@ -117,8 +117,8 @@ func sortedSquares(nums []int) []int {
 			right--
 		}
 		index--
-		return result
+
 	}
-	result[0] = nums[0] * nums[0]
+	result[0] = nums[left] * nums[right]
 	return result
 }

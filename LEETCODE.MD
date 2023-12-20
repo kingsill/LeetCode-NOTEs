@@ -758,7 +758,7 @@ func removeElement(nums []int, val int) int {
 }
 ```
 
-#### 有序数组的平方
+#### 有序数组的平方 leetcode977
 ##### 个人的初次尝试
 已经想到双指针法，但是对于循环的边界条件仍然找不明白，对于特殊情况没有适应性，很容易出错
 而且在更改的过程中喜欢钻牛角尖，不更改现有的惯性思维，后续需要更正这些缺点。
@@ -818,3 +818,121 @@ func sortedSquares(nums []int) []int {
 ```
 这里仍旧有瑕疵，比如我们这里在寻找最小正数时，可以将判断n是否等于L加入到判断条件中，而不使用break。后面的填入数字过程中也可以使用多个if else进行判断，不使用continue
 2. 两侧双指针
+```go
+// 两侧双指针法
+func sortedSquares(nums []int) []int {
+	//由于给定的数组是非递减排序，所以两侧的数平方是最大的，我们从两侧中间寻找最大值反向填充结果数组
+	L := len(nums)
+	left, right := 0, L-1 //定义左右两侧的指针
+	result := make([]int, L)
+	index := L - 1 //结果切边填入序列
+
+	for left != right { //当左右指针重合时，说明所有数据已经填充完毕
+		leftVal := nums[left] * nums[left]
+		rightVal := nums[right] * nums[right]
+		if leftVal >= rightVal { //左边值大，填入左边值
+			result[index] = leftVal
+			left++
+		} else {
+			result[index] = rightVal
+			right--
+		}
+		index--
+
+	}
+	result[0] = nums[left] * nums[right]
+	return result
+}
+```
+
+#### 长度最小的子数组 leetcode209
+##### 初次尝试之动态规划 × 超出内存限制
+利用如下图所示的思想，但是使用的空间太大了
+![Alt text](leetcode209.png)
+```go
+// 动态规划方法 超出内存限制
+func minSubArrayLen(target int, nums []int) int {
+	L := len(nums)
+	table := make([][]int, L)
+
+	length := 0
+	for i := 0; i < L; i++ {
+		if nums[i] >= target {
+			length = 1
+			return length
+		}
+		table[i] = make([]int, L) //结果表
+		table[i][i] = nums[i]     //对角线就是原本数据
+
+		//fmt.Println(table[i])
+	}
+
+	//x, y := 0, 1
+
+	//char := 0
+outLoop:
+	for i := 0; i < L-1; i++ {
+		x := 0 //行数都是从0开始
+		for y := i + 1; y < L; y++ {
+			table[x][y] = table[x][y-1] + table[x+1][y] - table[x+1][y-1]
+			if table[x][y] >= target { //如果当前的连续已经超过或等于target
+				length = y - x + 1
+				break outLoop //第一个大于target的目标即为最短的连续数组
+			}
+			x++
+		}
+
+	}
+
+	for i := 0; i < L; i++ {
+		fmt.Println(table[i])
+	}
+
+	return length
+}
+```
+##### 滑动窗口(?)我的猪鼻版本
+```go
+func minSubArrayLen(target int, nums []int) int {
+	L := len(nums)
+	n := 0 //n用来计算最小的连续数
+
+	left := 0
+	right := 0
+	add := 0
+
+	for { //第一个for用来找到第一组满足要求的连续数，后续再进行缩小
+		right = left + n
+		if right == L {
+			return 0
+		}
+		add += nums[right]
+		n++
+		if add >= target {
+			N := n - 1
+			for left != L { //第二个for进行缩小
+				add -= nums[left]
+				left++
+				if add >= target {
+					n--
+					N = n - 1
+					continue
+				}
+				right = left + N
+				if right == L {
+					break
+				}
+				add += nums[right]
+			}
+
+			return n
+		}
+	}
+
+}
+```
+
+##### 正宗版滑动窗口
+```go
+
+```
