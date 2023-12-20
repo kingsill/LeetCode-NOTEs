@@ -759,3 +759,62 @@ func removeElement(nums []int, val int) int {
 ```
 
 #### 有序数组的平方
+##### 个人的初次尝试
+已经想到双指针法，但是对于循环的边界条件仍然找不明白，对于特殊情况没有适应性，很容易出错
+而且在更改的过程中喜欢钻牛角尖，不更改现有的惯性思维，后续需要更正这些缺点。
+##### 双指针法
+1. 中心法
+先找中心位置，从中心开始双指针 从小到大
+```go
+
+// 中心位置法，先找到正负交界处的值
+func sortedSquares(nums []int) []int {
+	//找交界,我们这里找最小的正数
+	var i int                //最小正数的序列
+	L := len(nums)           //定义nums数组的长度
+	result := make([]int, L) //新建结果数组
+
+	for i = 0; nums[i] <= 0; {
+		i++
+		if i == L {
+			break
+		}
+	}
+	// fmt.Println(nums[i])
+
+	//从中心向两边
+	// 1.左边到边界
+	// 2.右边到边界
+	n := 0                      //result的序列
+	var nag, pos = i - 1, i     //定义正负两边的指针
+	for nag != -1 || pos != L { //循环到边界值，两个都到边界值说明所有值都填完
+
+		if nag == -1 { //非正填完，直接填正即可
+			result[n] = nums[pos] * nums[pos]
+			pos++
+			n++
+			continue
+		}
+		if pos == L { //正填完，直接填非正即可
+			result[n] = nums[nag] * nums[nag]
+			nag--
+			n++
+			continue
+		}
+
+		if -nums[nag] < nums[pos] { //非正部分小于正，填非正,nag-1
+			result[n] = nums[nag] * nums[nag]
+			nag--
+		} else { //非正部分大于等于正，填正，pos+1
+			result[n] = nums[pos] * nums[pos]
+			pos++
+		}
+		n++
+	}
+
+	return result
+}
+
+```
+这里仍旧有瑕疵，比如我们这里在寻找最小正数时，可以将判断n是否等于L加入到判断条件中，而不使用break。后面的填入数字过程中也可以使用多个if else进行判断，不使用continue
+2. 两侧双指针
