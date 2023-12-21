@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	nums := []int{1, 1, 1, 1, 1, 1, 1, 1}
-	target := 11
+	nums := []int{5, 1, 3, 5, 10, 7, 4, 9, 2, 8}
+	target := 15
 	c := minSubArrayLen(target, nums)
 	fmt.Println("c:", c)
 }
@@ -128,26 +128,50 @@ outLoop:
 	}
 }*/
 
-func minSubArrayLen(target int, nums []int) int {
-	i := 0          //左侧指针的位置
-	l := len(nums)  // 数组长度
-	sum := 0        // 子数组之和
-	result := l + 1 // 初始化返回长度为l+1，目的是为了判断“不存在符合条件的子数组，返回0”的情况
+//滑动窗口
+/*
+	func minSubArrayLen(target int, nums []int) int {
+		i := 0          //左侧指针的位置
+		l := len(nums)  // 数组长度
+		sum := 0        // 子数组之和
+		result := l + 1 // 初始化返回长度为l+1，目的是为了判断“不存在符合条件的子数组，返回0”的情况
 
-	for j := 0; j < l; j++ { //j为右侧指针，当右指针到末位时，到达边界
-		sum += nums[j]      //累计求和
-		for sum >= target { //边界条件为sum是否大于等于target
-			subLength := j - i + 1  //求满足条件时的子数组长度，这里为临时
-			if subLength < result { //比较此次的临时长度和保存的历史最短，选择最短则进行保存
-				result = subLength
+		for j := 0; j < l; j++ { //j为右侧指针，当右指针到末位时，到达边界
+			sum += nums[j]      //累计求和
+			for sum >= target { //边界条件为sum是否大于等于target
+				subLength := j - i + 1  //求满足条件时的子数组长度，这里为临时
+				if subLength < result { //比较此次的临时长度和保存的历史最短，选择最短则进行保存
+					result = subLength
+				}
+				sum -= nums[i] //将窗口向右滑动，将划出的数据删除
+				i++
 			}
-			sum -= nums[i] //将窗口向右滑动，将划出的数据删除
-			i++
+		}
+		if result == l+1 {
+			return 0
+		} else {
+			return result
 		}
 	}
-	if result == l+1 {
-		return 0
-	} else {
-		return result
+*/
+func minSubArrayLen(target int, nums []int) int {
+	add := 0
+	left, right := 0, 0
+	L := len(nums)
+	length := L + 1 //为了方便判断有无总和超过target
+
+	for right != L {
+		add += nums[right]
+		for add >= target { //当 当前 窗口内总和大于等于 target 为边界条件；
+			length = min(length, right-left+1) //更新最短长度
+			add -= nums[left]                  //删除画出的数据
+			left++                             //左指针右移
+		}
+		right++
+
 	}
+	if length == L+1 {
+		return 0
+	}
+	return length
 }
