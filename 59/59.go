@@ -97,40 +97,54 @@ func generateMatrix(n int) [][]int {
 		//fmt.Println(table[i]) //确认生成n*n
 	}
 
-	i := 1
-	x, y := 0, 0
+	i := 1 //需要填入的数据
+
 	c := n - 1
 
-	for ; c >= 0; c = c - 2 {
-		//for z := 0; z < 4; z++ {
+	layerNums := 0 //第几层
+
+	for ; c >= 0; c = c - 2 { //记每次循环每层每边中间间隔的个数，c=0时为最后中心只有一个数的那层
+		//n=2 2X2 C:1
+		//n=3 3X3 C:2 -> 0
+		/*
+			1 2 3
+			4 5 6
+			7 8 9
+		*/
+		//n=4 4X4 C:3 -> 1
+		/*
+			1  2  3  4
+			12 13 14 5
+			11 16 15 6
+			10  9  8 7
+		*/
+
+		x, y := layerNums, layerNums //记每层模拟的起始点
 		table[x][y] = i
-		for b := 0; b < c; b++ {
+		for b := 0; b < c; b++ { //先向右横
 			table[x][y] = i
-			if i == n*n {
-				return table
-			}
 			y++
 			i++
-
 		}
-		for b := 0; b < c; b++ {
+		for b := 0; b < c; b++ { //向下竖
 			table[x][y] = i
-
 			x++
 			i++
 		}
-		for b := 0; b < c; b++ {
+		for b := 0; b < c; b++ { //向左横
 			table[x][y] = i
 			y--
 			i++
 		}
-		for b := 0; b < c-1; b++ {
+		for b := 0; b < c; b++ { //向上竖
 			table[x][y] = i
 			x--
 			i++
 		}
-		y++
-		//}
+		//由于我们写入实际在下次循环才写入，所以最后一位的原点实际并未覆盖
+
+		layerNums++ //层数计数加一
 	}
+
 	return table
 }

@@ -1048,7 +1048,146 @@ func generateMatrix(n int) [][]int {
 ```
 
 ##### 模拟方式
+```go
+func generateMatrix(n int) [][]int {
+
+	//1.nXn矩阵
+	table := make([][]int, n)
+	for i := 0; i < n; i++ {
+		table[i] = make([]int, n)
+		//fmt.Println(table[i]) //确认生成n*n
+	}
+
+	i := 1 //需要填入的数据
+
+	c := n - 1
+
+	layerNums := 0            //第几层
+
+	for ; c >= 0; c = c - 2 { //记每次循环每层每边中间间隔的个数，c=0时为最后中心只有一个数的那层
+	//n=2 2X2 C:1
+	//n=3 3X3 C:2 -> 0
+	/*
+	1 2 3 
+	4 5 6
+	7 8 9
+ 	*/
+	//n=4 4X4 C:3 -> 1 
+	/* 
+	1  2  3  4
+	12 13 14 5
+	11 16 15 6
+	10  9  8 7
+	*/
+	
+	x, y := layerNums, layerNums //记每层模拟的起始点
+		table[x][y] = i
+		for b := 0; b < c; b++ {//先向右横
+			table[x][y] = i
+			y++
+			i++
+		}
+		for b := 0; b < c; b++ {//向下竖
+			table[x][y] = i
+			x++
+			i++
+		}
+		for b := 0; b < c; b++ {//向左横
+			table[x][y] = i
+			y--
+			i++
+		}
+		for b := 0; b < c; b++ {//向上竖
+			table[x][y] = i
+			x--
+			i++
+		}
+		//由于我们写入实际在下次循环才写入，所以最后一位的原点实际并未覆盖
 
 
+		layerNums++//层数计数加一
+	}
+
+	return table
+}
+
+```
+
+### 链表
+更多有关于go链表的内容可以见这篇文章[链表的创建和读取](https://blog.csdn.net/kingsill/article/details/134968248?spm=1001.2014.3001.5501)
+#### 链表基础知识部分
+什么是**链表**，链表是一种通过**指针**串联在一起的**线性结构**，每一个节点由两部分组成，一个是**数据域**一个是**指针域**（存放指向下一个节点的指针），最后一个节点的指针域指向null（空指针的意思）。
+
+链表的入口节点称为链表的**头结点**也就是`head`
+
+- 链表类型
+	- 单链表
+	![Alt text](singleList.png)
+	如上
+	- 双链表：	 
+	每一个节点有两个指针域，一个指向下一个节点，一个指向上一个节点。
+	![Alt text](doubleList.png)
+	- 循环链表
+	链表首尾相连
+	![Alt text](circularList.png)
+
+##### 链表的存储方式
+数组是在内存中是连续分布的，但是链表在内存中可不是连续分布的。
+
+##### 链表的定义
+go语言：单链表
+```go
+type ListNode struct {
+      Val int 		//数据域
+      Next *ListNode//指针域
+}
+```
+
+##### 链表的操作
+1. 节点删除
+只需要将删除的节点后面的节点连接到前面的节点即可
+由于go有自己的内存回收机制，删除的节点不用再手动释放
+![Alt text](deleteNode.png)
+2. 添加节点
+将要添加的节点指针域指向后面的节点，前面的指针域替换为要添加节点的
+![Alt text](addNode.png)
+
+##### 性能分析
+|时间复杂度|插入/删除|查询|适用场景|
+|:---:|---|---|---|
+|数组|O(n)|O(1)|数据量固定，频繁查询，较少增删|
+|链表|O(1)|O(n)|数据量不固定，频繁增删，较少查询|
+
+数组在定义的时候，长度就是固定的，如果想改动数组的长度，就需要重新定义一个新的数组。
+
+链表的长度可以是不固定的，并且可以动态增删， 适合数据量不固定，频繁增删，较少查询的场景。
+
+更多有关于go链表的内容可以见这篇文章[链表的创建和读取](https://blog.csdn.net/kingsill/article/details/134968248?spm=1001.2014.3001.5501)
 
 
+#### 移除链表元素 leetcode203
+
+##### 初版方法，使用迭代解决 ，利用虚拟头节点
+```go
+func removeElements(head *ListNode, val int) *ListNode {
+	//遍历节点
+
+	//targetList := new(ListNode) //golang自建类型可以使用make，如slice等；这里我们自定义类型使用new，new返回指针
+	targetList := &ListNode{} //直接实例化，可能更快
+
+	middle := targetList //target作为头节点
+
+	for head != nil {
+		if head.Val == val { //检测链表中的val是否等于val
+
+		} else { //如果不用删除，直接赋值
+			middle.Next = &ListNode{Val: head.Val}
+			middle = middle.Next
+		}
+		head = head.Next
+	}
+
+	return targetList.Next
+}
+
+```
