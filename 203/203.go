@@ -109,12 +109,21 @@ type ListNode struct {
 
 // 递归
 func removeElements(head *ListNode, val int) *ListNode {
-	if head == nil {
+
+	//放在递归开头的为 结束条件 ，其应该return一个结果，结束本次递归
+	//即本次递归传入的 head为空，不再进行后续递归，将尾节点设置为空
+	if head != nil {
 		return head
 	}
-	head.Next = removeElements(head.Next, val)
+
+	//调用自身
+	//修改子节点
+	head.Next = removeElements(head.Next, val) //我们也可以通过这个式子理解 下面的返回 返回到.next
+
+	//递归式-整合子问题的解决成果
+	//返回到父节点
 	if head.Val == val {
-		return head.Next
+		return head.Next //如果当前节点的val等于val则舍弃该节点
 	}
 	return head
 }
