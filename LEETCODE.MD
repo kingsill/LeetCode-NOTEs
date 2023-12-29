@@ -1316,3 +1316,28 @@ func removeElements(head *ListNode, val int) *ListNode {
 }
 
 ```
+
+#### 设计链表 Leetcode707
+题目要求我们通过实现几个方法来完成对链表的各个操作
+由于在go语言中都为值传递，（注意这里与值类型、引用类型的而区别），所以即使我们直接在方法中传入指针，但是我们在方法里是不能直接修改指针所改的地址，其在方法中只会复制一份副本进行操作，而不会影响到原变量。
+所以我们这里可以设置一个结构体，在mylinkedlist中在定义链表节点进行解决。
+[关于值传递的注意事项](https://juejin.cn/post/7221730647043244090)
+
+这里放一个经典的愚蠢案例以作警戒，妄想通过副本直接影响原链表
+我是猪
+```go
+func (this *MyLinkedList) AddAtTail(val int) {
+	Node := this.Head
+	if Node == nil {
+		Node = &ListNode{Val: val}
+		//this.Head = Node
+		return
+	}
+	for Node.Next != nil {
+		Node = Node.Next
+	}
+	Node.Next = &ListNode{Val: val}
+}
+```
+
+
