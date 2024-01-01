@@ -3,16 +3,16 @@ package main
 func main() {
 	List := Constructor()
 
-	List.AddAtHead(2)
-	List.DeleteAtIndex(1)
-	List.AddAtHead(2)
-	List.AddAtHead(7)
-	List.AddAtHead(3)
-	List.AddAtHead(2)
+	List.AddAtHead(4)
+	List.Get(1)
+	List.AddAtHead(1)
 	List.AddAtHead(5)
-	List.AddAtTail(5)
-	List.Get(5)
-	List.DeleteAtIndex(6)
+	List.DeleteAtIndex(3)
+	List.AddAtHead(7)
+	List.Get(3)
+	List.Get(3)
+	List.Get(3)
+	List.AddAtHead(1)
 	List.DeleteAtIndex(4)
 
 }
@@ -23,7 +23,8 @@ type ListNode struct {
 	Next *ListNode
 }
 
-/*// MyLinkedList 为了方便操作链表建立的结构体
+/*// 正常建立，不涉及头节点
+// MyLinkedList 为了方便操作链表建立的结构体
 type MyLinkedList struct {
 	size int
 	Head *ListNode
@@ -145,24 +146,29 @@ func (this *MyLinkedList) DeleteAtIndex(index int) {
 	cur.Next = cur.Next.Next
 	this.Head = Node
 	this.size--
-}
-*/
+}*/
 
-//本次目标时建立具有虚拟头节点的链表
+//本次目标时建立具有 头节点 的链表(虚拟头节点，但实际就是有头节点)
+//链表结构：H* 0 1 2 3
 //优势，在对头节点后的节点进行操作会方便
 
 type MyLinkedList struct {
-	Size int
-	Head *ListNode
+	Size      int
+	DummyHead *ListNode
 }
 
+// Constructor 使用虚拟头节点时，很关键的一步在在初始化我们的mylinkedlist，我们需要直接对dummyhead分配内存空间，防止后续对首个节点进行操作时出现问题
 func Constructor() MyLinkedList {
-	return MyLinkedList{}
+	return MyLinkedList{DummyHead: &ListNode{}}
 }
 
 func (this *MyLinkedList) Get(index int) int {
 	//*h 0 1 2 3	;0
-	DummyHead := this.Head
+	if this.Size <= index {
+		return -1
+	}
+
+	DummyHead := this.DummyHead
 	cur := DummyHead
 
 	for ; index >= 0; index-- {
@@ -173,14 +179,23 @@ func (this *MyLinkedList) Get(index int) int {
 }
 
 func (this *MyLinkedList) AddAtHead(val int) {
-	if this.Size == 0 {
-		this.Head = &ListNode{Next: &ListNode{Val: val}}
-		this.Size++
-	} else {
-		this.Head = &ListNode{Next: &ListNode{Val: val, Next: this.Head.Next}}
-		this.Size++
-	}
 
+	//if this.Size == 0 {
+	//	this.Head = &ListNode{Next: &ListNode{Val: val}}
+	//	this.Size++
+	//} else {
+	//	this.Head.Next = &ListNode{Val: val, Next: this.Head.Next}
+	//	this.Size++
+	//}
+
+	//newNode := &ListNode{Val: val} // 创建新节点
+	//newNode.Next = this.Head.Next  // 新节点指向当前头节点
+	//this.Head.Next = newNode       // 新节点变为头节点
+	//this.Size++                    // 链表大小增加1
+
+	//上面第一块没想明白，逻辑有问题；第二部分进行整合，本质一样
+	this.DummyHead.Next = &ListNode{Val: val, Next: this.DummyHead.Next}
+	this.Size++
 }
 
 func (this *MyLinkedList) AddAtTail(val int) {
@@ -188,14 +203,14 @@ func (this *MyLinkedList) AddAtTail(val int) {
 		this.AddAtHead(val)
 		return
 	}
-	DummyHead := this.Head
+	DummyHead := this.DummyHead
 	cur := DummyHead
 	//h* 0 1 2 3 4	;
 	for cur.Next != nil {
 		cur = cur.Next
 	}
 	cur.Next = &ListNode{Val: val}
-	this.Head = DummyHead
+	this.DummyHead = DummyHead
 	this.Size++
 }
 
@@ -210,14 +225,14 @@ func (this *MyLinkedList) AddAtIndex(index int, val int) {
 	//<长度，插入到index节点前
 	//h* 0 1 2 3 4	；2
 	if this.Size > index {
-		DummyHead := this.Head
+		DummyHead := this.DummyHead
 		cur := DummyHead
 
 		for ; index > 0; index-- {
 			cur = cur.Next
 		}
 		cur.Next = &ListNode{Val: val, Next: cur.Next}
-		this.Head = DummyHead
+		this.DummyHead = DummyHead
 		this.Size++
 	}
 
@@ -227,14 +242,14 @@ func (this *MyLinkedList) DeleteAtIndex(index int) {
 	//h* 0 1 2 3 4	;0
 
 	if this.Size > index {
-		DummyHead := this.Head
+		DummyHead := this.DummyHead
 		cur := DummyHead
 
 		for ; index > 0; index-- {
 			cur = cur.Next
 		}
 		cur.Next = cur.Next.Next
-		this.Head = DummyHead
+		this.DummyHead = DummyHead
 		this.Size--
 	}
 
