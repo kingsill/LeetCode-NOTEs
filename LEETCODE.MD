@@ -1586,6 +1586,84 @@ func (this *MyLinkedList) DeleteAtIndex(index int) {
 ```
 
 
+#### 翻转链表 leetcode206 
+至此走到这里，我们对于链表的结构应当已经比较熟悉，下面的就是敢于操作
+
+##### 题解第一版 直接建立新的链表
+时间复杂度太高
+```go
+// 初始方法，建立新链表
+func reverseList(head *ListNode) *ListNode {
+	NewNode := &ListNode{}
+
+	for ; head != nil; head = head.Next {
+		NewNode.Val = head.Val
+		NewNode = &ListNode{Next: NewNode}
+	}
+
+	return NewNode.Next
+}
+
+```
+
+##### 双指针迭代
+其实在初始时也曾考虑过，最后没有直面的勇气，抽自己两个大嘴巴子，必须醒悟，fuckmyself
+当时卡在觉得修改顺序会将链表后面的一大串也甩过来，现在发现多虑了
+```go
+// 迭代 双指针法
+func reverseList(head *ListNode) *ListNode {
+
+	////如果原链表为空或者nil，直接返回原链表
+	//if head == nil || head.Next == nil {
+	//	return head
+	//}
+
+	// 0 1 2 3 4
+	cur := head
+
+	//pre := &ListNode{}
+	var pre *ListNode //这样定义不分配内存，在后续第一次向外赋值即为nil；而上面的定义则会为0
+
+	//结果后续函数可以覆盖前面的特殊情况 ：）
+	for cur != nil {
+		c := cur.Next
+		cur.Next = pre
+		pre = cur
+		cur = c
+	}
+	return pre
+
+}
+
+```
+
+##### 递归法
+链表的操作需要记住三个东西，上一个是谁，我是谁，下一个是谁。
+
+用递归帮忙记住了上一个是谁，那么问题是我是谁，下一个是谁？第一行的if判断，是两种临界情况，第一种是头结点为空，不用管；第二种是没有下一个了，只用知道我是谁，直接返回就行。下面的几行代码，我明显是head，下一个就是head->next，由于要反转链表，我的下一个要变成我的上一个，因此head->next->next = head，我的上一个（递归）等到这层递归出去再解决。可以看到newHead在递归结束返回后是没有进行任何操作的，也就是返回的是最底层的那个，起到传递尾（新首）结点的作用
+
+```go
+// 递归，也为双指针
+// 把自己和后面的换
+func reverseList(head *ListNode) *ListNode {
+	//递归结束条件
+	if head == nil || head.Next == nil {
+		return head
+	}
+
+	//调用自身
+	newHead := reverseList(head.Next)
+
+	//处理递归
+	//由于翻转链表，那么我们的目的就是目前节点的下一个改为上一个
+	//目前节点head.next
+	head.Next.Next = head
+	//上面这么写会使链表成环，这里要打破 环
+	head.Next = nil
+
+	return newHead
+}
+```
 
 
 
