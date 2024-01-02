@@ -16,8 +16,8 @@ func main() {
 	fmt.Printf("h: %v\n", h)
 }
 
-// 每两个进行一次交换
-func swapPairs(head *ListNode) *ListNode {
+//递归 每两个进行一次交换
+/*func swapPairs(head *ListNode) *ListNode {
 	//每两个的第一个节点
 	var pre *ListNode
 	//递归结束条件，即当剩下的节点不满足两个时
@@ -39,4 +39,17 @@ func swapPairs(head *ListNode) *ListNode {
 	//将交换次序后的返回
 	return pre
 
+}*/
+
+// 使用迭代方法
+func swapPairs(head *ListNode) *ListNode {
+	dummyHead := &ListNode{}
+	cur := dummyHead
+	for cur != nil && cur.Next != nil {
+
+		cur.Next = head.Next
+		cur.Next.Next = head
+	}
+
+	return dummyHead.Next
 }
