@@ -1731,7 +1731,79 @@ func swapPairs(head *ListNode) *ListNode {
 
 ```
 
-### 删除链表的倒数第N个节点 leetcode19
+#### 删除链表的倒数第N个节点 leetcode19
 
+##### 递归
+由于这里是删除倒数第N个节点，比较适合使用递归进行 从终到始 的运行
+```go
+func removeNthFromEnd(head *ListNode, n int) *ListNode {
 
+	// 创建一个虚拟头节点，简化边界条件处理
+	dummy := &ListNode{Next: head}
 
+	//检查是否需要删除头节点
+	//if remove(dummy, n) == n {
+	//	return dummy.Next
+	//}
+
+	remove(dummy, n)
+	return dummy.Next
+}
+
+func remove(node *ListNode, n int) int {
+
+	//循环结束条件，找到最后一个节点
+	if node == nil {
+		return 0
+	}
+
+	index := remove(node.Next, n) + 1
+
+	//如果当前节点的下一个节点是目标节点
+	if index == n+1 {
+		node.Next = node.Next.Next
+	}
+
+	return index
+}
+
+```
+
+##### 双指针法 迭代
+双指针的经典应用，如果要删除倒数第n个节点，让fast移动n步，然后让fast和slow同时移动，直到fast指向链表末尾。删掉slow所指向的节点就可以了。
+同时也使用了虚拟头节点的方式
+还可以
+
+![img.png](leetcode19.png)
+
+```go
+// 双指针 迭代
+
+func removeNthFromEnd(head *ListNode, n int) *ListNode {
+	dummyHead := &ListNode{Next: head}
+	fast, slow := dummyHead, dummyHead
+
+	//fast和slow指针之间的差值
+	var diff int
+
+	//循环结束条件，fast移动到最后一个节点
+	for fast.Next != nil {
+		//如果差值到n，则fast和slow指针都向后偏移即可
+		if diff == n {
+			fast = fast.Next
+			slow = slow.Next
+		} else { //差值不到n，则只有fast指针移动，直到满足差值要求
+			fast = fast.Next
+			diff++
+		}
+
+	}
+
+	if diff == n {
+		slow.Next = slow.Next.Next
+	}
+
+	return dummyHead.Next
+}
+
+```
