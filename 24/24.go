@@ -42,13 +42,23 @@ func main() {
 }*/
 
 // 使用迭代方法
+// 不能操之过急，这里前面迭代完连接的应当还是未交换过的次序
 func swapPairs(head *ListNode) *ListNode {
-	dummyHead := &ListNode{}
-	cur := dummyHead
-	for cur != nil && cur.Next != nil {
 
-		cur.Next = head.Next
-		cur.Next.Next = head
+	dummyHead := &ListNode{}
+	cur := dummyHead //用来保存当前位置
+
+	cur.Next = head
+	for cur.Next != nil && cur.Next.Next != nil {
+
+		node1 := cur.Next
+		node2 := cur.Next.Next
+		next := cur.Next.Next.Next
+
+		cur.Next = node2
+		node2.Next = node1
+		node1.Next = next
+		cur = node1
 	}
 
 	return dummyHead.Next

@@ -1696,8 +1696,42 @@ func swapPairs(head *ListNode) *ListNode {
 ```
 
 ##### 迭代方法，虚拟头节点
+```go
+// 使用迭代方法
+// 不能操之过急，这里前面迭代完连接的应当还是未交换过的次序
+func swapPairs(head *ListNode) *ListNode {
 
+	dummyHead := &ListNode{}
+	cur := dummyHead //用来保存当前位置
 
+	//赋予初始值
+	cur.Next = head
+	
+	//结束条件，即后续节点不满足两个
+	for cur.Next != nil && cur.Next.Next != nil {
+
+		//要交换的两个节点记为node1和node2；下一次迭代的起始定义为next
+		//h* 1 2 3 4
+		node1 := cur.Next
+		node2 := cur.Next.Next
+		next := cur.Next.Next.Next
+
+		//交换步骤
+		cur.Next = node2
+		node2.Next = node1
+		node1.Next = next
+		
+		//更改下次迭代的开始节点
+		cur = node1
+	}
+
+	//由于使用虚拟头节点，返回真实的链表
+	return dummyHead.Next
+}
+
+```
+
+### 删除链表的倒数第N个节点 leetcode19
 
 
 
