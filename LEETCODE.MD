@@ -1807,3 +1807,166 @@ func removeNthFromEnd(head *ListNode, n int) *ListNode {
 }
 
 ```
+
+
+#### 相交链表 leetcode160 
+由于链表深度不一致，所以不太好使用递归
+
+- 检测方法 ：
+  - 相交链表，即两个链表上一个节点的`Next`指向 同一个地址
+  - 先检测同样Val值，再查看地址
+使用map？
+
+同时这里要求我们返回的是相交节点的 `Val`
+##### 暴力求解 map
+遍历
+```go
+
+func getIntersectionNode(headA, headB *ListNode) *ListNode {
+	//考虑到从第一个节点就相交的情况，设立虚拟头节点
+	DummyHeadA := &ListNode{Next: headA}
+	DummyHeadB := &ListNode{Next: headB}
+
+	//使用map进行记录
+	var resultA = map[*ListNode]int{}
+	var resultB = map[*ListNode]int{}
+
+	//遍历两个链表
+	for DummyHeadA.Next != nil || DummyHeadB.Next != nil {
+
+		if DummyHeadA.Next == nil {
+			resultB[DummyHeadB.Next] = DummyHeadB.Next.Val
+			DummyHeadB = DummyHeadB.Next
+		} else if DummyHeadB.Next == nil {
+			resultA[DummyHeadA.Next] = DummyHeadA.Next.Val
+			DummyHeadA = DummyHeadA.Next
+		} else {
+			resultA[DummyHeadA.Next] = DummyHeadA.Next.Val
+			DummyHeadA = DummyHeadA.Next
+
+			resultB[DummyHeadB.Next] = DummyHeadB.Next.Val
+			DummyHeadB = DummyHeadB.Next
+		}
+
+		//检查map中是否记录相交节点
+		if _, ok := resultA[DummyHeadB]; ok {
+			return DummyHeadB
+		}
+		if _, ok := resultB[DummyHeadA]; ok {
+			return DummyHeadA
+		}
+
+	}
+	return nil
+}
+
+
+```
+##### 双指针1
+前面陷入思维误区，相交节点之后两个链表是完全一致的，所以我们可以忽略长链表比短链表长的一部分，
+从长度一样的地方开始 两个链表同时遍历，相交节点一定位于**同一级**
+```go
+// 双指针
+func getIntersectionNode(headA, headB *ListNode) *ListNode {
+
+	//遍历两链表得到链表长度
+	La := 0
+	Lb := 0
+
+	curA := headA
+	curB := headB
+
+	for curA != nil {
+		curA = curA.Next
+		La++
+	}
+
+	for curB != nil {
+		curB = curB.Next
+		Lb++
+	}
+
+	//将较长的链表偏移到和较短的链表一样长的位置
+	if La > Lb {
+		for diff := La - Lb; diff > 0; diff-- {
+			headA = headA.Next
+		}
+	}
+
+	if La <= Lb {
+		for diff := Lb - La; diff > 0; diff-- {
+			headB = headB.Next
+		}
+	}
+
+	//同级每个节点进行比较，相同则为相交节点
+	for headA != nil {
+
+		if headA == headB {
+			return headA
+		}
+		headA = headA.Next
+		headB = headB.Next
+
+	}
+
+	return nil
+}
+
+
+```
+##### 双指针2 巧妙 该部分源于leetcode官方题解
+**思路和算法**
+使用双指针的方法，可以将空间复杂度降至 O(1)O(1)O(1)。
+
+只有当链表 `headA `和 `headB` 都不为空时，两个链表才可能相交。因此首先判断链表 `headA `和` headB` 是否为空，如果其中至少有一个链表为空，则两个链表一定不相交，返回` null`
+
+当链表 `headA `和 `headB `都不为空时，创建两个指针 `pA` 和 `pB`，初始时分别指向两个链表的头节点` headA `和 `headB` ，然后将两个指针依次遍历两个链表的每个节点。具体做法如下：
+
+每步操作需要同时更新指针` pA `和` pB`
+
+如果指针 `pA` 不为空，则将指针 `pA` 移到下一个节点；如果指针 `pB `不为空，则将指针 `pB` 移到下一个节点。
+
+如果指针 `pA`为空，则将指针 `pA `移到链表 headB 的头节点；如果指针 `pB` 为空，则将指针 `pB` 移到链表` headA` 的头节点。
+
+当指针` pA `和` pB `指向同一个节点或者都为空时，返回它们指向的节点或者 `null`
+```go
+func getIntersectionNode(headA, headB *ListNode) *ListNode {
+	if headA == nil || headB == nil {
+		return nil
+	}
+	pa, pb := headA, headB
+	for pa != pb {
+		if pa == nil {
+			pa = headB
+		} else {
+			pa = pa.Next
+		}
+		if pb == nil {
+			pb = headA
+		} else {
+			pb = pb.Next
+		}
+	}
+	return pa
+}
+
+```
+
+下面提供双指针方法的正确性证明。考虑两种情况，第一种情况是两个链表相交，第二种情况是两个链表不相交。
+
+- 情况一：两个链表相交
+
+链表` headA `和 `headB `的长度分别是 `m` 和 `n`。假设链表 `headA` 的不相交部分有 `a `个节点，链表 `headB `的不相交部分有 `b` 个节点，两个链表相交的部分有 `c` 个节点，则有 `a+c=ma+c=ma+c=m，b+c=nb+c=nb+c=n`。
+
+如果 a=b，则两个指针会同时到达两个链表相交的节点，此时返回相交的节点；
+
+如果 `a≠b` ，则指针 `pA `会遍历完链表 `headA`，指针 `pB `会遍历完链表 `headB`，两个指针不会同时到达链表的尾节点，然后指针 `pA` 移到链表 `headB `的头节点，指针 `pB` 移到链表 `headA` 的头节点，然后两个指针继续移动，在指针` pA`  移动了 `a+c+b` 次、指针 `pB` 移动了 `b+c+a` 次之后，两个指针会同时到达两个链表相交的节点，该节点也是两个指针第一次同时指向的节点，此时返回相交的节点。
+
+- 情况二：两个链表不相交
+
+链表 `headA` 和` headB `的长度分别是 `m` 和 `n` 。考虑当 `m=n `和 `m≠n` 时，两个指针分别会如何移动：
+
+如果 `m=n` ，则两个指针会同时到达两个链表的尾节点，然后同时变成空值 `null`，此时返回 `null`
+
+如果 `m≠n`，则由于两个链表没有公共节点，两个指针也不会同时到达两个链表的尾节点，因此两个指针都会遍历完两个链表，在指针 `pA `移动了` m+n `次、指针` pB `移动了` n+m `次之后，两个指针会同时变成空值 `null`，此时返回 `null`。
