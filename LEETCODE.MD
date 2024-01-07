@@ -2057,9 +2057,98 @@ return nil
 
 ```
 ### 哈希表
+首先什么是 **哈希表**，哈希表（英文名字为`Hash table`，国内也有一些算法书籍翻译为散列表，大家看到这两个名称知道都是指hash table就可以了）。哈希表在Golang中即为`map`
+
+#### 有效的字母异位词 leetcode242
+##### 普通的使用map表进行记录的方法
+由于题目规定只有26个小写的英文字符，因此我们直接建立26容量的map
+```go
+func isAnagram(s string, t string) bool {
+	//创建储存记录的map表
+	sTable := make(map[int32]int, 26)
+	tTable := make(map[int32]int, 26)
+
+	//每次遍历到记录个数+1
+	for _, val := range s {
+		sTable[val]++
+	}
+	for _, val := range t {
+		tTable[val]++
+	}
+
+	//如果字母个数都不一样，不是字母异位词
+	if len(sTable) != len(tTable) {
+		return false
+	}
+
+	//比较两个记录表是否相同
+	for i, _ := range sTable {
+		if sTable[i] != tTable[i] {
+			return false
+		}
+	}
+	return true
+
+}
+
+```
+- 改进后，只建立一个map表
+```go
+func isAnagram(s, t string) bool {
+    var c1, c2 [26]int
+    for _, ch := range s {
+        c1[ch-'a']++
+    }
+    for _, ch := range t {
+        c2[ch-'a']++
+    }
+    return c1 == c2
+}
+```
 
 
+##### 使用字符排序的方式
+直接比较排序过后的字符串是否相同
+> 部分相关知识回忆：
+> 1. string转slice：
+> 
+>    - []byte(s)
+>    - copy(dst []Type, src []Type)
+> 
+>    byte用rune替代也可以。byte是int8；rune是int32，用来表示unicode字符编码，索引一个字符
+> 2. sort函数
+> 
+>   func Slice(x any, less func(i int, j int) bool).
+>
+>   时间复杂度O(nlog（n）)，空间复杂度O（logn）
+> 
+>   本题中使用的即为ascending order，在后面的函数中进行规则指定.
+> 
+>   sort.slice必须传入slice，否则进行报错，所以对字符串需要进行转化 
 
+```go
+// 排序方法
+func isAnagram(s string, t string) bool {
+	//StringToSlice
+	S := []rune(s)
+	T := []rune(t)
+
+	//进行排序
+	sort.Slice(S, func(i, j int) bool {
+		return S[i] < S[j]
+	})
+	sort.Slice(T, func(i, j int) bool {
+		return T[i] < T[j]
+	})
+
+	//比较排序后字符串是否相同
+	if string(S) == string(T) {
+		return true
+	}
+	return false
+}
+
+```
 
 
 
