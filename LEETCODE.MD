@@ -2247,16 +2247,63 @@ func intersection(nums1 []int, nums2 []int) (res []int) {
 
 ```
 
+#### 快乐数 leetcode202
+##### 利用map记录
+对于本体中快乐数的检测，如果非快乐数，应该会在循环中有**重复**的数出现。
+当为3位数时，即使为999，每位的平方和仅为243，所以能循环的数肯定是有限的。我们使用map进行数据的记录，当检测到重复时，说明不是快乐数。
+```go
+func isHappy(n int) bool {
+	result := 0
+	temp := 0
+	record := make(map[int]int)
+
+	for result != 1 {
+
+		for ; n != 0; n = n / 10 {
+
+			c := n % 10
+			temp += c * c
+			result = temp
+		}
+		if _, ok := record[result]; ok {
+			return false
+		}
+		record[result] = 1
+		n = result
+		temp = 0
+	}
+	return true
+
+}
+
+```
+
+##### 快慢指针法
+这里的思路可以参考[这部分](https://blog.csdn.net/kingsill/article/details/135425304?spm=1001.2014.3001.5501)
+当一个数为快乐数时，1往后的平方和都为1，因此我可以设立`fast`和`slow`两个指针。`fast`一次进行两次循环，`slow`一次进行一次循环。
+所以如果不是快乐数，二者一定会重合。
+```go
+func isHappy(n int) bool {
+	slow, fast := n, step(n)
+	for fast != 1 && slow != fast {
+		slow = step(slow)
+		fast = step(step(fast))
+	}
+	return fast == 1
+}
+
+//为了方便，我们直接将计算下一步的模块独立为函数
+func step(n int) int {
+	sum := 0
+	for n > 0 {
+		sum += (n % 10) * (n % 10)
+		n = n / 10
+	}
+	return sum
+}
 
 
-
-
-
-
-
-
-
-
+```
 
 
 
