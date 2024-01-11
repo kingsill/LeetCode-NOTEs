@@ -2342,10 +2342,34 @@ func fourSumCount(nums1 []int, nums2 []int, nums3 []int, nums4 []int) int {
 
 ```
 
+#### 赎金信 leetcode383
+```go
+// 使用map进行记录
+func canConstruct(ransomNote string, magazine string) bool {
+	record := make(map[int32]int)
+
+	for _, i2 := range magazine {
+
+		record[i2]++
+	}
+
+	for _, i2 := range ransomNote {
+		if record[i2] <= 0 {
+			return false
+		}
+		record[i2]--
+
+	}
+	return true
+
+}
+
+```
 
 
-
-
+#### 三数之和 leetcode15
+知识补充：
+>map的key值必须是可以比较运算的类型，不可以是函数、map、slice
 
 
 
