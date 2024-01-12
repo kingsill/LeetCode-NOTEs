@@ -2371,10 +2371,103 @@ func canConstruct(ransomNote string, magazine string) bool {
 知识补充：
 >map的key值必须是可以比较运算的类型，不可以是函数、map、slice
 
+##### map记录 失败！
+```go
+//得到结果后再去重 失败！
+func threeSum(nums []int) [][]int {
+	L := len(nums)
 
+	var intT string
 
+	result := [][]int{}
 
+	N := map[int]int{}
+	G := map[string]int{}
 
+	table := make([][]int, L)
+
+	for i, _ := range table {
+		table[i] = make([]int, L)
+	}
+
+	for i, v := range nums {
+		N[v] = i
+	}
+
+	for i := 0; i < L-1; i++ {
+		for c := i + 1; c < L; c++ {
+			table[i][c] = nums[i] + nums[c]
+			if index, ok := N[-table[i][c]]; ok {
+				if index != i && index != c {
+					order := []int{nums[i], nums[c], nums[index]}
+
+					slices.Sort(order)
+
+					for _, v := range order {
+						intT = fmt.Sprintf(intT, string(rune(v)))
+					}
+
+					if _, cont := G[intT]; !cont {
+						result = append(result, []int{nums[i], nums[c], nums[index]})
+					}
+					G[intT] = 1
+					intT = ""
+				}
+			}
+
+		}
+	}
+	// fmt.Print(table)
+	return result
+}
+```
+
+##### 双指针法
+拿这个nums数组来举例，首先将数组排序，然后有一层for循环，i从下标0的地方开始，同时定一个下标left 定义在i+1的位置上，定义下标right 在数组结尾的位置上。
+
+依然还是在数组中找到 abc 使得a + b +c =0，我们这里相当于 a = nums[i]，b = nums[left]，c = nums[right]。
+
+接下来如何移动left 和right呢， 如果nums[i] + nums[left] + nums[right] > 0 就说明 此时三数之和大了，因为数组是排序后了，所以right下标就应该向左移动，这样才能让三数之和小一些。
+
+如果 nums[i] + nums[left] + nums[right] < 0 说明 此时 三数之和小了，left 就向右移动，才能让三数之和大一些，直到left与right相遇为止。
+```go
+func threeSum(nums []int) [][]int {
+	n := len(nums)
+	sort.Ints(nums)
+	ans := make([][]int, 0)
+
+	// 枚举 first
+	for first := 0; first < n; first++ {
+		// 需要和上一次枚举的数不相同
+		if first > 0 && nums[first] == nums[first-1] {
+			continue
+		}
+		// third 对应的指针初始指向数组的最右端
+		third := n - 1
+		target := -1 * nums[first]
+		// 枚举 second
+		for second := first + 1; second < n; second++ {
+			// 需要和上一次枚举的数不相同
+			if second > first+1 && nums[second] == nums[second-1] {
+				continue
+			}
+			// 需要保证 second 的指针在 third 的指针的左侧
+			for second < third && nums[second]+nums[third] > target {
+				third--
+			}
+			// 如果指针重合，随着 second 后续的增加
+			// 就不会有满足 first+second+third=0 并且 second<third 的 third 了，可以退出循环
+			if second == third {
+				break
+			}
+			if nums[second]+nums[third] == target {
+				ans = append(ans, []int{nums[first], nums[second], nums[third]})
+			}
+		}
+	}
+	return ans
+}
+```
 
 
 
