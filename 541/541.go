@@ -1,7 +1,12 @@
 package main
 
-func main() {
+import "fmt"
 
+func main() {
+	s := "12312312312"
+	k := 2
+	c := reverseStr(s, k)
+	fmt.Println(c)
 }
 
 func reverseStr(s string, k int) string {
@@ -9,17 +14,30 @@ func reverseStr(s string, k int) string {
 
 	str := []byte(s)
 
-	record := [][]byte{}
+	record := []byte{}
 
 	n := L / k
 
 	for i := 0; i < n; i++ {
-		record = append(record, str[:])
+		temp := str[k*i : (i+1)*k]
+
+		//假如是奇数，则需要进行倒序
+		if i%2 == 0 {
+			reverseString(temp)
+		}
+
+		record = append(record, temp...)
 	}
 
-	reverseString(str)
+	temp := str[n*k:]
+	if n%2 == 0 {
+		reverseString(temp)
+	}
 
+	record = append(record, temp...)
+	return string(record)
 }
+
 func reverseString(s []byte) {
 	L := len(s)
 	//双指针
