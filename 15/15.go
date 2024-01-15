@@ -6,16 +6,16 @@ import (
 )
 
 func main() {
-	nums := []int{-1, 0, 1, 2, -1, -4, -2, -3, 3, 0, 4}
+	nums := []int{-2, 0, 1, 1, 2}
 	c := threeSum(nums)
 	fmt.Printf("c: %v\n", c)
 
 }
 
 // 得到结果后再去重 失败,超出输出限制
-func threeSum(nums []int) [][]int {
+/*func threeSum(nums []int) [][]int {
 	L := len(nums)
-	
+
 	var intT string
 
 	result := [][]int{}
@@ -59,30 +59,6 @@ func threeSum(nums []int) [][]int {
 	}
 	// fmt.Print(table)
 	return result
-}
-
-// 双指针法
-/*func threeSum(nums []int) [][]int {
-
-	slices.Sort(nums)
-	L := len(nums)
-
-	result := [][]int{}
-
-	for left := 0; left < L; left++ {
-		for middle := left + 1; middle < L; middle++ {
-			for right := middle + 1; right < L; right++ {
-				if nums[left]+nums[middle]+nums[right] == 0 {
-					result = append(result, []int{nums[left], nums[middle], nums[right]})
-				}
-
-			}
-		}
-	}
-
-	fmt.Println(nums)
-
-	return nil
 }*/
 
 // 官方解题
@@ -123,3 +99,49 @@ func threeSum(nums []int) [][]int {
 	return ans
 }
 */
+
+// 自我救赎的双指针法
+func threeSum(nums []int) [][]int {
+	slices.Sort(nums)
+	L := len(nums)
+	record := [][]int{}
+
+	//第一个数
+	for i, i2 := range nums[:L-2] {
+
+		//左指针为第二个数，右指针为第三个数。左指针每次从第一个数后一个开始，右指针则从最末尾开始
+		left, right := i+1, L-1
+
+		//第一个数的去重 ，如{-1 -1 0 1}，[0,2,3]和[1,2,3]都满足要求，但是其数组都为[-1,0,1]应该去除之一。所以说当检测当本次循环与上次一致的话，直接跳过
+		if i > 0 && i2 == nums[i-1] {
+			continue
+		}
+
+		//循环的结束条件为左指针与右指针重合，即第二个数和第三个数序号一致
+		for left < right {
+			if i2+nums[left]+nums[right] == 0 {
+				record = append(record, []int{i2, nums[left], nums[right]})
+				left++
+				right--
+
+				//对第二个数进行去重
+				for nums[left] == nums[left-1] && left < L-1 {
+					left++
+				}
+
+				//对第三个数进行去重
+				for nums[right] == nums[right+1] && right > 1 {
+					right--
+				}
+			}
+			if i2+nums[left]+nums[right] > 0 {
+				right--
+			}
+			if i2+nums[left]+nums[right] < 0 {
+				left++
+			}
+		}
+
+	}
+	return record
+}
