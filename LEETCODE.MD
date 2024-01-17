@@ -2689,8 +2689,94 @@ func main() {
 ```
 但在实际使用的过程中，第二部分所需的运行存储反而更多
 
+#### 翻转字符串中的单词 leetcode151
+##### 常规做法 双指针
 
+```go
+func reverseWords(s string) string {
+WordList := []string{}
+left := 0
+L := len(s)
+//fmt.Println(L)
 
+	for i, i2 := range s {
+		//去除重复的空格
+		if i > 0 && s[i-1] == ' ' && i2 == ' ' {
+			left++
+			continue
+		}
+
+		//不为空格时右指针移动，并且如果最后一位也为字母时添加到存储表
+		if i2 != ' ' {
+			if i == L-1 {
+				WordList = append(WordList, s[left:i+1])
+			}
+		} else { //当为空格时，将当前的左右指针对应的单词放入存储表，同时给左指针赋值
+			if i != 0 {
+				WordList = append(WordList, s[left:i])
+			}
+			left = i + 1
+		}
+	}
+	S := WordList[0]
+	for i, s2 := range WordList {
+		if i != 0 {
+			S = s2 + " " + S
+		}
+	}
+	return S
+}
+```
+
+##### 进阶做法 空间复杂度O（1）
+解题思路如下：
+- 移除多余空格
+- 将整个字符串反转
+- 将每个单词反转
+```go
+func reverseWords(s string) string {
+	// 1.去除字符串中多余的空格
+	b := []byte(s) //将字符串转换为字符切片
+	slow, l := 0, len(b)
+	for fast := 0; fast < l; fast++ {
+		if b[fast] != ' ' { //直接让fast指针移动到第一个字母的位置
+			if slow != 0 { //排除字符串开头的空格
+				b[slow] = ' ' //保留单词间的空格
+				slow++
+			}
+			for fast < l && b[fast] != ' ' {
+				b[slow] = b[fast]
+				slow++
+				fast++
+			}
+		}
+	}
+	b = b[:slow] //取slow之前的字符串
+	// 2.反转整体字符串
+	reverse(b)
+	// 3.反转每个单词
+	last := 0 //慢指针
+	l = len(b)
+	for i := 0; i <= l; i++ { //注意这里是i<=l
+		if i == l || b[i] == ' ' { //当i等于字符串长度或者值为空,i==l必须写在前面因为b[l]不存在会报错
+			reverse(b[last:i]) //反转每个单词，左闭右开
+			last = i + 1
+		}
+	}
+	return string(b) //将字符切片转换为字符串
+}
+func reverse(s []byte) {
+L := len(s)
+//双指针
+left, right := 0, L-1
+
+for left < right {
+s[left], s[right] = s[right], s[left]
+left++
+right--
+}
+}
+```
 
 
 
