@@ -2776,22 +2776,368 @@ left++
 right--
 }
 }
+``` 
+#### 右旋字符串 55卡码网
+
+>关于go中切片的拷贝问题：
+> 通过[:]的方式进行赋值的方式，如b:=a[:2],由于其共享底层的数组，所以说修改其中之一，另一个也是受影响的，为**浅拷贝**
+> 切片如果想要实现深拷贝，需要使用**`copy`**
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+	//1.使用递归？
+
+	//2.从头开始遍历，但是从第k个开始写入
+
+	/*	for i, b := range middle {
+
+		}*/
+
+	//3.直接修改middle切片
+	//前K个单独切出来，再将其插入到后一部分的后面
+	/*
+			var k int
+			var s string
+
+			fmt.Scanln(&k)
+			fmt.Scanln(&s)
+
+			middle := []byte(s)
+
+			//获取切片长度
+			L := len(s)
+
+		front := make([]byte, L-k)
+			back := make([]byte, k)
+
+			copy(front, middle[:L-k])
+			copy(back, middle[L-k:])
+
+			bytes := append(back, front...)
+
+			result := string(bytes)
+
+			fmt.Println(result)*/
+
+	//4.先将全部字符倒叙，再在两部分分别进行倒序
+
+	var str string
+	var target int
+
+	fmt.Scanln(&target)
+	fmt.Scanln(&str)
+	strByte := []byte(str)
+
+	reverse(strByte, 0, len(strByte)-1)
+	reverse(strByte, 0, target-1)
+	reverse(strByte, target, len(strByte)-1)
+
+	fmt.Printf(string(strByte))
+
+}
+func reverse(strByte []byte, l, r int) {
+	for l < r {
+		strByte[l], strByte[r] = strByte[r], strByte[l]
+		l++
+		r--
+	}
+}
+
+```
+
+#### 找出字符串中第一个匹配项的下标 leetcode28 串的模式匹配问题
+##### 暴力求解
+```go
+func strStr(haystack string, needle string) int {
+L := len(needle)
+Cap := len(haystack)
+
+H := []byte(haystack)
+N := []byte(needle)
+
+for i, val := range H {
+
+if val == N[0] {
+if i+L <= Cap && haystack[i:i+L] == needle {
+return i
+}
+}
+}
+return -1
+}
 ```
 
 
+##### 使用KMP模式匹配算法
+###### KMP算法简述
+当出现字符串不匹配时，可以记录一部分之前已经匹配的文本内容，利用这些信息避免从头再去做匹配。
+其主要的用途就是查找字符串，从**主字符串**中寻找**模式字符串**。
+其相比暴力解法，时间复杂度从O(mXn)》O（m+n）
+
+所以如何记录已经匹配的文本内容，是KMP的重点，也是**next数组**肩负的重任。
+
+>什么叫字符串的**前缀后缀**？
+> 对于字符串`ababc` 来说，它的**前缀**有 `[a,ab,aba,abab]`，也就是以字符串第一个字符作为开头，同时不包括最后一个字符的所有子串，
+> 同理它的**后缀**有 `[c,bc,abc,babc]`，也就是以字符串最后一个字符作为结尾，同时不包括第一个字符的所有字串。
 
 
+1. 思路分析  
+当我们进行字符串匹配时，假如第一次匹配失败时如图所示  
+![img.png](KPM1.png)    
+第4个字母不一致，但前三个字母是一致的，那么当我们继续寻找时，没有必要再从第一个字母开始对应    
+![img_1.png](KPM2.png)  
+**为什么我们能看出不从第一个字母进行对应呢？**   
+续接我们提到的前后缀的概念，前三个字符为aba，则前缀为`a,ab` 后缀为 `a,ba`,二者之中最长的相等的部分为`a`，一般称这个最长的部分为**最长公共前后缀**  
+由此，我们第一个字母`a`就没有必要再进行比较，直接从第2个字母开始进行比较即可  
+那么，从这里我们又能够发现，下次从第几个数字开始进行比较，只跟这次重复的子串有关系，  
+因此我们可以对模式字符串建立一个数组，分别记录当第几个开始不对应时，下次从第几个再开始比较，也就是常说的`next`
+2. `next`数组（前缀表）
+   前缀表是用来回退的，它记录了模式串与主串(文本串)不匹配的时候，模式串应该从哪里开始重新匹配。
 
+3. 使用`next`数组来进行匹配
+以下我们以前缀表统一减一之后的next数组来做演示。   
+有了next数组，就可以根据next数组来 匹配文本串s，和模式串t了。  
+注意next数组是新前缀表（旧前缀表统一减一了）。 
+这里借用代码随想录中的gif来示意：
 
+##### KMP算法的代码实现
+思路可以参考这篇[文章](https://www.xdull.cn/kmp.html#%E6%B1%82%E8%A7%A3%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%89%8D%E5%90%8E%E7%BC%80)
 
+1. 计算next数组
+```go
+// 此函数用来初始化next数组
+func initNext(needle string) []int {
+	//后缀中末尾  abc中c
+	i := 1
 
+	//前缀中末尾;同时在这里也有着记录最长公共串长度的作用，二者本质是一样的
+	j := 0
 
+	L := len(needle)
 
+	//初始化next数组；next[0]默认为0，因为对于一个字母我们不认为其具有前后缀，后续也不会再对next[0]进行赋值
+	next := make([]int, L)
 
+	//求next数组过程中，我们的i不回退，采用类似于动态规划的思想，也是我们这里的循环条件
+	for i < L {
 
+		//如果前后缀匹配
+		if needle[i] == needle[j] {
 
+			//前缀末尾向后移一位，同时代表长度+1
+			j++
 
+			//当前后缀末尾所在位置的最长子串即为j
+			//最长子串是有基础的，如果next[2]=2，那么next[3]的可能性为3或者0,这里是为3的情况
+			next[i] = j
 
+			//后缀末尾向后移一位
+			i++
+
+		} else { //如果前后缀不匹配
+
+			//当j>0，说明仍旧处于回退的过程
+			if j > 0 {
+				j = next[j-1]
+			} else { //如果j=0，并且前后缀依旧不匹配，则长度计数应该重新从0开始
+
+				//这里是为0的情况
+				next[i] = j
+
+				//后缀末尾向后移
+				i++
+			}
+		}
+	}
+	//返回next数组
+	return next
+}
+```
+
+2. 利用next数组进行字符串的匹配
+```go
+// kmp算法，用空间换时间
+func strStr(haystack string, needle string) int {
+	//获取next数组
+	next := initNext(needle)
+
+	//主串长度
+	L := len(haystack)
+
+	//目标匹配长度，即needle的长度
+	target := len(needle)
+
+	//匹配字符串中指针位置
+	j := 0
+
+	//i为主串中指针的位置
+	for i := 0; i < L; {
+
+		// 如果匹配上了
+		if haystack[i] == needle[j] {
+			if j == target-1 {
+				return i - target + 1
+			}
+			j++
+			i++
+		} else { //如果没匹配上
+
+			//跟计算next数组有异曲同工之妙
+			if j > 0 {
+				j = next[j-1]
+			} else {
+				i++
+			}
+
+		}
+	}
+
+	return -1
+}
+```
+
+#### 重复的子字符串 leetcode459
+##### 暴力
+```go
+func repeatedSubstringPattern(s string) bool {
+
+	L := len(s)
+
+	record := false
+
+	for i := 1; i < L/2+1; i++ {
+		if L%i != 0 {
+			continue
+		}
+		num := L / i
+
+		for ; num > 0; num-- {
+			if s[:i] != s[(num-1)*i:num*i] {
+				record = false
+				break
+			}
+			record = true
+		}
+		if record == true {
+			return record
+		}
+	}
+	return record
+
+}
+```
+##### 字符串拼接+KMP
+如果有一个子字符串重复可以构成原字符串，则两个字符串拼接后其中一定包含一个原字符串
+nnn=s，则s+s=nn|nnn|n中也包含一个s
+abc=s，则s+s=a|bcab|c，其中bca，cab一定不为s
+
+主要函数部分：
+```go
+// 移动匹配-----------------------------------
+func repeatedSubstringPattern(s string) bool {
+	sDouble := s + s
+	L := len(sDouble)
+	if strStr(sDouble[1:L-1], s) == -1 {
+		return false
+	}
+	return true
+}
+```
+
+KMP函数部分：[kmp算法相关请移步这篇文章](https://blog.csdn.net/kingsill/article/details/135731944?spm=1001.2014.3001.5501)
+```go
+// kmp算法，用空间换时间
+func strStr(haystack string, needle string) int {
+	//获取next数组
+next := initNext(needle)
+
+//主串长度
+L := len(haystack)
+
+//目标匹配长度，即needle的长度
+target := len(needle)
+
+//匹配字符串中指针位置
+j := 0
+
+//i为主串中指针的位置
+for i := 0; i < L; {
+
+// 如果匹配上了
+if haystack[i] == needle[j] {
+if j == target-1 {
+return i - target + 1
+}
+j++
+i++
+} else { //如果没匹配上
+
+//跟计算next数组有异曲同工之妙
+if j > 0 {
+j = next[j-1]
+} else {
+i++
+}
+
+}
+}
+
+return -1
+}
+
+// 此函数用来初始化next数组
+func initNext(needle string) []int {
+//后缀中末尾  abc中c
+i := 1
+
+//前缀中末尾;同时在这里也有着记录最长公共串长度的作用，二者本质是一样的
+j := 0
+
+L := len(needle)
+
+//初始化next数组；next[0]默认为0，因为对于一个字母我们不认为其具有前后缀，后续也不会再对next[0]进行赋值
+next := make([]int, L)
+
+//求next数组过程中，我们的i不回退，采用类似于动态规划的思想，也是我们这里的循环条件
+for i < L {
+
+//如果前后缀匹配
+if needle[i] == needle[j] {
+
+//前缀末尾向后移一位，同时代表长度+1
+j++
+
+//当前后缀末尾所在位置的最长子串即为j
+//最长子串是有基础的，如果next[2]=2，那么next[3]的可能性为3或者0,这里是为3的情况
+next[i] = j
+
+//后缀末尾向后移一位
+i++
+
+} else { //如果前后缀不匹配
+
+//当j>0，说明仍旧处于回退的过程
+if j > 0 {
+j = next[j-1]
+} else { //如果j=0，并且前后缀依旧不匹配，则长度计数应该重新从0开始
+
+//这里是为0的情况
+next[i] = j
+
+//后缀末尾向后移
+i++
+}
+}
+}
+//返回next数组
+return next
+}
+```
 
 
 
