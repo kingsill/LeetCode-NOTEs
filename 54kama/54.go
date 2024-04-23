@@ -67,3 +67,36 @@ func main() {
 
 	fmt.Println(c)
 }
+
+//重来版本
+/*
+package main
+
+import "fmt"
+
+func main() {
+	var c []byte
+
+	fmt.Scanln(&c)
+
+	number := []byte{'n', 'u', 'm', 'b', 'e', 'r'}
+
+	L := len(c)
+
+	for i := 0; i < L; i++ {
+		if c[i]-'a' > 26 {
+			if i+1 == L {
+				c = append(c[:i], number...)
+				break
+			}
+
+			c = append(c[:i], append(number, c[i+1:]...)...)
+			L += 5
+			i += 5
+		}
+
+	}
+	fmt.Println(string(c))
+}
+
+*/

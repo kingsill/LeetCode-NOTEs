@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 
-	origin := "  hello world  "
+	origin := "a good   example"
 	s := reverseWords(origin)
 	fmt.Println(s)
 }
@@ -43,7 +43,7 @@ func main() {
 	}
 	return S
 }*/
-
+/*
 func reverseWords(s string) string {
 	WordList := []string{}
 	left := 0
@@ -76,4 +76,58 @@ func reverseWords(s string) string {
 		}
 	}
 	return S
+}*/
+
+// 重来版本
+func reverseWords(s string) string {
+	str := []byte(s)
+	str = cutHead(str)
+	reverse(str)
+	str = cutHead(str)
+	str = removeSpace(str)
+	L := len(str)
+	right := 0
+	left := 0
+	for ; right < L; right++ {
+		if str[right]-' ' == 0 {
+			reverse(str[left:right])
+			left = right + 1
+		}
+	}
+
+	reverse(str[left:L])
+
+	return string(str)
+}
+
+func cutHead(str []byte) []byte {
+	for i, i2 := range str {
+		if i2-' ' != 0 {
+			return str[i:]
+		}
+	}
+	return str
+}
+
+func reverse(str []byte) {
+	L := len(str)
+	left := 0
+	right := L - 1
+	for left < right {
+		str[left], str[right] = str[right], str[left]
+		left++
+		right--
+	}
+}
+
+func removeSpace(str []byte) []byte {
+	index := 0
+	for index < len(str) {
+		if str[index]-' ' == 0 && str[index-1]-' ' == 0 {
+			str = append(str[:index], str[index+1:]...)
+			index--
+		}
+		index++
+	}
+	return str
 }

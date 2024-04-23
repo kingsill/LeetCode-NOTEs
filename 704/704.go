@@ -6,7 +6,7 @@ import (
 
 func main() {
 	nums := []int{-1, 0, 3, 5, 9, 12}
-	n := search(nums, 8)
+	n := search(nums, 0)
 	fmt.Println(n)
 }
 
@@ -83,6 +83,7 @@ func main() {
 }*/
 
 // 左闭右开区间版本
+/*
 func search(nums []int, target int) int {
 	high := len(nums) //由于右开，取不到最右边的数，所以这里不用-1也不会超限
 	low := 0
@@ -97,4 +98,27 @@ func search(nums []int, target int) int {
 		}
 	}
 	return -1
+}
+*/
+
+// 重来版本
+// 注意 左右区间定义方面的知识
+func search(nums []int, target int) int {
+
+	high, low := len(nums), 0
+
+	for low < high {
+		//1 0 		2,3 1		4,5 2		6,7 3
+		mid := (low + high) / 2
+		if nums[mid] == target {
+			return mid
+		}
+		if nums[mid] > target {
+			high = mid
+		} else {
+			low = mid + 1
+		}
+	}
+	return -1
+
 }

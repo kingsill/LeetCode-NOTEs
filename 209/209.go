@@ -3,8 +3,8 @@ package main
 import "fmt"
 
 func main() {
-	nums := []int{5, 1, 3, 5, 10, 7, 4, 9, 2, 8}
-	target := 15
+	nums := []int{1, 2, 3, 4, 5}
+	target := 11
 	c := minSubArrayLen(target, nums)
 	fmt.Println("c:", c)
 }
@@ -154,6 +154,29 @@ outLoop:
 		}
 	}
 */
+func minSubArrayLen(target int, nums []int) int {
+	add := 0
+	left, right := 0, 0
+	L := len(nums)
+	length := L + 1 //为了方便判断有无总和超过target
+
+	for right != L {
+		add += nums[right]
+		for add >= target { //当 当前 窗口内总和大于等于 target 为边界条件；
+			length = min(length, right-left+1) //更新最短长度
+			add -= nums[left]                  //删除画出的数据
+			left++                             //左指针右移
+		}
+		right++
+
+	}
+	if length == L+1 {
+		return 0
+	}
+	return length
+}
+
+// 重来，但是看错题目
 func minSubArrayLen(target int, nums []int) int {
 	add := 0
 	left, right := 0, 0

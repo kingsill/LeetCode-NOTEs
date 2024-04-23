@@ -73,7 +73,7 @@ type ListNode struct {
 
 // 递归，也为双指针
 // 把自己和后面的换
-func reverseList(head *ListNode) *ListNode {
+/*func reverseList(head *ListNode) *ListNode {
 	//递归结束条件
 	if head == nil || head.Next == nil {
 		return head
@@ -90,4 +90,22 @@ func reverseList(head *ListNode) *ListNode {
 	head.Next = nil
 
 	return newHead
+}
+*/
+
+// 重来
+func reverseList(head *ListNode) *ListNode {
+	return reverse(head)
+}
+
+func reverse(head *ListNode) *ListNode {
+	Node := head
+
+	//结束循环的条件 节点到达尾节点
+	if Node.Next.Next != nil {
+		reverse(Node.Next)
+	}
+
+	Node.Next.Next = Node
+	return Node.Next
 }

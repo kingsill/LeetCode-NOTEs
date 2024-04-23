@@ -84,7 +84,7 @@ func putOff(nums []int, i int, val int, length int) {
 
 // 双向指针版
 // 相向双指针法
-func removeElement(nums []int, val int) int {
+/*func removeElement(nums []int, val int) int {
 	// 有点像二分查找的左闭右闭区间 所以下面是<=
 	left := 0
 	right := len(nums) - 1
@@ -104,5 +104,21 @@ func removeElement(nums []int, val int) int {
 		}
 	}
 	fmt.Println(nums)
+	return left
+}
+*/
+
+// 重来 轻松拿下
+func removeElement(nums []int, val int) int {
+	//left指针用来赋值，right用来寻值
+	left := 0
+	//right到头时结束
+
+	for _, rightVal := range nums {
+		if rightVal != val {
+			nums[left] = rightVal
+			left++
+		}
+	}
 	return left
 }

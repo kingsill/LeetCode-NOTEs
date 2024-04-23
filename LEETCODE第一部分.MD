@@ -578,7 +578,7 @@ func longestPalindrome(s string) string {
 >数组下标从0开始
 数组内存空间地址是连续的
 
-#### 二分查找 leetcode704<span id="jump"><span>
+#### 二分查找 leetcode704 <span id="jump"><span>
 [前面部分第4题，包括使用条件等](#jump2)
 [感谢代码随想录：）](https://www.programmercarl.com/0704.%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE.html#%E7%AE%97%E6%B3%95%E5%85%AC%E5%BC%80%E8%AF%BE)
 &emsp;&emsp;二分查找法中对于 **区间** 的定义

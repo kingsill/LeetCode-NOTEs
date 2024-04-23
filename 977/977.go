@@ -122,3 +122,24 @@ func sortedSquares(nums []int) []int {
 	result[0] = nums[left] * nums[right]
 	return result
 }
+
+// 重来版本
+func sortedSquares(nums []int) []int {
+	low, high, index := 0, len(nums)-1, len(nums)-1
+	result := make([]int, high+1)
+	for low <= high {
+		left := nums[low] * nums[low]
+		right := nums[high] * nums[high]
+
+		if left > right {
+			result[index] = left
+			low++
+		} else {
+			result[index] = right
+			high--
+		}
+
+		index--
+	}
+	return result
+}
